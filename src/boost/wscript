@@ -1,0 +1,93 @@
+#!/usr/bin/env python
+# encoding: utf-8
+'''
+boost is tricky to build
+'''
+
+
+import os
+from orch.features import pfi
+from orch import features as featmod
+from orch import util
+from orch.wafutil import exec_command
+import waflib.Logs as msg
+
+PACKAGE = {
+    'name': 'lcg-builders/boost',
+    'author': ['atlas collaboration'],
+}
+
+# we expect the tarball feature to be configured so that the
+# source_unpacked is in the build directory as we must do an
+# in-source build for boost.
+requirements = dict(
+    build_dir = 'builds/{source_unpacked}',
+    # 'unpacked_target': None,
+    # 'source_unpacked': None,
+    # 'prepare_cmd': None,
+    # 'prepare_cmd_options': None,
+    # 'prepare_target': None,
+    # 'build_dir': None,
+)
+
+@pfi.feature('boostbuild', **requirements)
+def feature_boostbuild(info):
+
+    def prepare_task(task):
+        cmd = "(cd tools/build/v2 && ./bootstrap.sh)"
+        return exec_command(task, cmd)
+
+    info.task('prepare',
+             rule = prepare_task,
+             source = info.unpacked_target,
+             target = info.prepare_target,)
+
+    def build_task(task):
+        src_dir = os.path.dirname(info.prepare_target.abspath())
+        cmd = "(cd %s && make)" % src_dir
+        return exec_command(task, cmd)
+
+    info.task('build',
+              rule = build_task,
+              source = info.prepare_target,
+              target = info.build_target,
+              )
+
+    def install_task(task):
+        src_dir = os.path.dirname(info.prepare_target.abspath())
+        cmd = "(cd %s && make install)" % src_dir
+        return exec_command(task, cmd)
+
+    info.task('install',
+             rule = build_task,
+             source = info.unpacked_target,
+             target = info.build_target,)
+
+def pkg_deps(ctx):
+    pass
+
+def configure(ctx):
+    pass
+
+def build(bld):
+    pkgname = 'boost'
+    delayed_deps = list()
+    pkgcfg = bld.env.orch_package_dict[pkgname]
+    featlist = pkgcfg.get('features').split()
+    featcfg = featmod.feature_requirements(featlist)
+
+    feature_funcs, feature_configs = featmod.load()
+
+    for feat in featlist:
+        pcfg = util.update_if(featcfg, None, **pkgcfg)
+        try:
+            feat_func = feature_funcs[feat]
+        except KeyError:
+            msg.error('No method for feature: "%s", package: "%s"'%(feat,pkgname))
+            raise
+        msg.debug('orch: feature: "%s" for package: "%s"' % (feat, pkgname))
+        dep = feat_func(bld, pcfg)
+        delayed_deps.append(dep)
+    for dep in delayed_deps:
+        dep.register_dependencies()
+        
