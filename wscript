@@ -29,9 +29,9 @@ def options(ctx):
 
 def configure(ctx):
     ctx.load('hwaf')
-    ctx.env.prepend_value('PATH', ctx.hwaf_subst_vars('${INSTALL_AREA}/${CMTCFG}/bin'))
-    ctx.env.prepend_value('LD_LIBRARY_PATH', ctx.hwaf_subst_vars('${INSTALL_AREA}/${CMTCFG}/lib'))
-    ctx.env.prepend_value('LD_LIBRARY_PATH', ctx.hwaf_subst_vars('${INSTALL_AREA}/${CMTCFG}/lib64'))
+    ctx.env.prepend_value('PATH', ctx.hwaf_subst_vars('${INSTALL_AREA}/${HWAF_VARIANT}/bin'))
+    ctx.env.prepend_value('LD_LIBRARY_PATH', ctx.hwaf_subst_vars('${INSTALL_AREA}/${HWAF_VARIANT}/lib'))
+    ctx.env.prepend_value('LD_LIBRARY_PATH', ctx.hwaf_subst_vars('${INSTALL_AREA}/${HWAF_VARIANT}/lib64'))
     ctx.hwaf_configure()
     return
 
