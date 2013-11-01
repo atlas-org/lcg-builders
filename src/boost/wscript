@@ -34,13 +34,20 @@ requirements = dict(
 def feature_boostbuild(info):
 
     def prepare_task(task):
-        cmd = "(cd tools/build/v2 && ./bootstrap.sh)"
+        #cmd = "(cd tools/build/v2 && ./bootstrap.sh)"
+        cmd = "%s/boost_patch.sh && %s/boost_prepare.sh" % (
+            info._ctx.path.abspath(),
+            info._ctx.path.abspath(),
+            )
         return exec_command(task, cmd)
 
-    info.task('prepare',
-             rule = prepare_task,
-             source = info.unpacked_target,
-             target = info.prepare_target,)
+    info.task(
+        'prepare',
+        rule = prepare_task,
+        source = info.unpacked_target,
+        target = info.prepare_target,
+        cwd = info.build_dir.abspath(),
+        )
 
     def build_task(task):
         src_dir = os.path.dirname(info.prepare_target.abspath())
