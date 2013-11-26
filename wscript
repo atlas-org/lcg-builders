@@ -8,7 +8,7 @@ import os
 # globals ---------------------------------------------------------------------
 top = '.'
 out = '__build__'
-PREFIX = 'install_area'
+PREFIX = 'install-area'
 VERSION = '0.0.1' # FIXME: should take it from somewhere else
 APPNAME = 'lcg-builders'
 
