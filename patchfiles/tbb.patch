@@ -1,0 +1,14 @@
+diff -urN tbb41_20130314oss-orig/Makefile tbb41_20130314oss/Makefile
+--- tbb41_20130314oss-orig/Makefile	2013-11-28 18:51:55.780732854 +0100
++++ tbb41_20130314oss/Makefile	2013-11-28 19:07:24.853421764 +0100
+@@ -86,3 +86,10 @@
+ 	@echo runtime=$(runtime)
+ 	@echo tbb_build_prefix=$(tbb_build_prefix)
+ 
++install: tbb
++	@echo Installing $(work_dir)_release under [$(PREFIX)]
++	$(shell $(MD) "$(PREFIX)/lib" >$(NUL) 2>$(NUL))
++	$(shell $(MD) "$(PREFIX)/include" >$(NUL) 2>$(NUL))
++	$(shell $(CP)    $(work_dir)_release/*.so* $(PREFIX)/lib/.)
++	$(shell $(CP) -r include/tbb $(PREFIX)/include/.)
++
