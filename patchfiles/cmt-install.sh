@@ -18,7 +18,7 @@ pushd ${install_dir}
 pushd ${install_dir}/mgr
 ./INSTALL
 . ./setup.sh
-make
+make STATIC=1
 popd
 
 /bin/mv $CMTBIN tmp.${CMTBIN}
